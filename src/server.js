@@ -1,7 +1,7 @@
 import Fastify from 'fastify'
-import routes from './routes/routes.js'
+import routes from '../src/routes/routes.ts'
 import fastifyPostgres from '@fastify/postgres'
-import prismaConnector from './plugins/prismaConnector.js'
+import prismaConnector from '../src/plugins/prismaConnector.ts'
 import swagger from '@fastify/swagger'
 import swaggerUi from '@fastify/swagger-ui'
 

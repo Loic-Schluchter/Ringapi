@@ -1,4 +1,21 @@
-async function routes(fastify, options) {
+import type { FastifyInstance, FastifyPluginOptions } from "fastify";
+import { Prisma } from '../../generated/prisma/client.js'
+
+type Query = {
+    page: number,
+    limit: number,
+    type?: string,
+    colonized?: string,
+    name?: string,
+
+}
+
+
+
+async function routes(
+    fastify: FastifyInstance,
+    option: FastifyPluginOptions
+) {
     // Welcome route
     fastify.get('/', {
         schema: {
@@ -17,7 +34,7 @@ async function routes(fastify, options) {
         return { Hi: 'Welcome to Ring API' }
     })
 
-    fastify.get('/planets', {
+    fastify.get<{ Querystring: Query }>('/planets', {
         schema: {
             description: 'Returns all planets',
             tags: ['Planets'],
@@ -72,17 +89,17 @@ async function routes(fastify, options) {
 
                                 }
                             }
+                        },
+                        pagination: {
+                            type: 'object',
+                            properties: {
+                                page: { type: 'integer' },
+                                limit: { type: 'integer' },
+                                total: { type: 'integer' },
+                                totalPages: { type: 'integer' }
+                            }
                         }
                     },
-                    pagination: {
-                        type: 'object',
-                        properties: {
-                            page: { type: 'integer' },
-                            limit: { type: 'integer' },
-                            total: { type: 'integer' },
-                            totalPages: { type: 'integer' }
-                        }
-                    }
                 }
             },
         },
@@ -92,7 +109,7 @@ async function routes(fastify, options) {
 
             const { page, limit, type, colonized, name } = request.query
             const skip = (page - 1) * limit
-            const where = {}
+            const where: Prisma.planetWhereInput = {}
             if (type) {
                 where.type = { equals: type, mode: 'insensitive' }
             }
@@ -146,7 +163,7 @@ async function routes(fastify, options) {
         }
     });
 
-    fastify.get('/planets/:planet', {
+    fastify.get<{ Querystring: Query; Params: { planet: string } }>('/planets/:planet', {
         schema: {
             description: 'Returns a single planet by name (case-insensitive), including its moons and solar system',
             tags: ['Planets'],
@@ -254,7 +271,7 @@ async function routes(fastify, options) {
         }
     });
 
-    fastify.get('/moons', {
+    fastify.get<{ Querystring: Query }>('/moons', {
         schema: {
             description: 'Returns all moons',
             tags: ['Moons'],
@@ -307,7 +324,7 @@ async function routes(fastify, options) {
 
             const { page, limit, name } = request.query
             const skip = (page - 1) * limit
-            const where = {}
+            const where: Prisma.moonWhereInput = {}
             if (name) {
                 where.name = {
                     contains: name,
@@ -354,7 +371,7 @@ async function routes(fastify, options) {
         }
     });
 
-    fastify.get('/moons/:moon', {
+    fastify.get<{ Querystring: Query; Params: { moon: string } }>('/moons/:moon', {
         schema: {
             description: 'Returns a single moon by name, including its planet',
             tags: ['Moons'],
@@ -372,14 +389,15 @@ async function routes(fastify, options) {
                             }
                         }
                     }
+                },
+                404: {
+                    type: 'object',
+                    properties: {
+                        error: { type: 'string' }
+                    }
                 }
             },
-            404: {
-                type: 'object',
-                properties: {
-                    error: { type: 'string' }
-                }
-            }
+
         }
     }, async (request, reply) => {
         try {
@@ -411,7 +429,7 @@ async function routes(fastify, options) {
         }
     });
 
-    fastify.get('/systems', {
+    fastify.get<{ Querystring: Query }>('/systems', {
         schema: {
             description: 'Returns all systems',
             tags: ['Systems'],
@@ -457,7 +475,7 @@ async function routes(fastify, options) {
 
             const { page, limit, name } = request.query
             const skip = (page - 1) * limit
-            const where = {}
+            const where: Prisma.systemWhereInput = {}
             if (name) {
                 where.name = {
                     contains: name,
@@ -494,7 +512,7 @@ async function routes(fastify, options) {
     })
 
 
-    fastify.get('/systems/:system', {
+    fastify.get<{ Querystring: Query; Params: { system: string } }>('/systems/:system', {
         schema: {
             description: 'Returns a single system by slug, including its planets',
             tags: ['Systems'],
@@ -572,7 +590,7 @@ async function routes(fastify, options) {
         }
     });
 
-    fastify.get('/government', {
+    fastify.get<{ Querystring: Query }>('/government', {
         schema: {
             description: 'Returns all government',
             tags: ['Government'],
@@ -619,7 +637,7 @@ async function routes(fastify, options) {
 
             const { page, limit, name } = request.query
             const skip = (page - 1) * limit
-            const where = {}
+            const where: Prisma.governmentWhereInput = {}
             if (name) {
                 where.name = {
                     contains: name,
@@ -655,7 +673,7 @@ async function routes(fastify, options) {
         }
     })
 
-    fastify.get('/government/:government', {
+    fastify.get<{ Querystring: Query; Params: { government: string } }>('/government/:government', {
         schema: {
             description: 'Returns a single government by slug',
             tags: ['Government'],
@@ -674,16 +692,10 @@ async function routes(fastify, options) {
                         slug: { type: 'string' },
                         description: { type: 'string' },
                         type: { type: 'string' },
-                        executiveBranch: { type: 'string' },
-                        legislativeBranch: { type: 'string' },
+                        executiveBranch: { type: 'Json' },
+                        legislativeBranch: { type: 'Json' },
                         militaryBranch: {
-                            type: 'array',
-                            items: {
-                                type: 'object',
-                                properties: {
-                                    name: { type: 'string' }
-                                }
-                            }
+
                         },
                         species: { type: 'string' },
 

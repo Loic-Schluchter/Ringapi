@@ -1,22 +1,28 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../generated/prisma/client.js"
+import { PrismaClient } from "../../generated/prisma/client.js"
 import fp from "fastify-plugin"
+import type { FastifyInstance } from "fastify";
+
+
 
 const connectionString = `${process.env.DATABASE_URL}`;
 
 
-async function prismaConnector (fastify, option){
+async function prismaConnector(
+    fastify: FastifyInstance,
+    option
+) {
 
-    const adapter = new PrismaPg({connectionString})
+    const adapter = new PrismaPg({ connectionString })
     console.log("Adapter created")
-    const prisma = new PrismaClient({adapter})
+    const prisma = new PrismaClient({ adapter })
     console.log("Prisma client created")
 
     await prisma.$connect()
     console.log("Prisma connected")
 
     fastify.decorate('prisma', prisma)
-    fastify.addHook('onClose', async (instance) =>{
+    fastify.addHook('onClose', async (instance) => {
         await instance.prisma.$disconnect()
     })
 

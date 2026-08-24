@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --env-file=.env --watch server.js"
+    "dev": "node --env-file=.env --watch src/server.js"
   },
   "dependencies": {
     "@fastify/postgres": "^6.1.0",
