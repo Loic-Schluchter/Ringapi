@@ -1,7 +1,7 @@
 import Fastify from 'fastify'
-import routes from '../src/routes/routes.ts'
+import routes from './routes/routes.ts'
 import fastifyPostgres from '@fastify/postgres'
-import prismaConnector from '../src/plugins/prismaConnector.ts'
+import prismaConnector from './plugins/prismaConnector.ts'
 import swagger from '@fastify/swagger'
 import swaggerUi from '@fastify/swagger-ui'
 
@@ -10,8 +10,13 @@ const fastify = Fastify({
   logger: true
 })
 
+if (!process.env.DATABASE_URL) {
+  fastify.log.error("Database missing")
+  process.exit(1)
+}
+
 fastify.register(fastifyPostgres, {
-  connectionString: process.env.DATABASE_URL
+  connectionString: (process.env.DATABASE_URL)
 })
 
 fastify.register(swagger, {
@@ -34,7 +39,7 @@ fastify.register(prismaConnector)
 const start = async () => {
   try {
     await fastify.listen({
-      port: process.env.PORT || 3000,
+      port: Number(process.env.PORT) || 3000,
       host: '0.0.0.0'
     })
   } catch (err) {

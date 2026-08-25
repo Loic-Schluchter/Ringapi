@@ -2,8 +2,8 @@
   "name": "ringapi",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --env-file=.env --watch src/server.js"
+    "start": "node src/server.ts",
+    "dev": "node --env-file=.env --watch src/server.ts"
   },
   "dependencies": {
     "@fastify/postgres": "^6.1.0",
