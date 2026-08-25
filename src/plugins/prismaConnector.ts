@@ -1,16 +1,14 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../../generated/prisma/client.js"
 import fp from "fastify-plugin"
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance} from "fastify";
 
 
 
 const connectionString = `${process.env.DATABASE_URL}`;
 
-
 async function prismaConnector(
     fastify: FastifyInstance,
-    option
 ) {
 
     const adapter = new PrismaPg({ connectionString })

@@ -16,7 +16,7 @@ async function routes(
     fastify: FastifyInstance,
     option: FastifyPluginOptions
 ) {
-    // Welcome route
+
     fastify.get('/', {
         schema: {
             description: 'Welcome route',
@@ -692,13 +692,12 @@ async function routes(
                         slug: { type: 'string' },
                         description: { type: 'string' },
                         type: { type: 'string' },
-                        executiveBranch: { type: 'Json' },
-                        legislativeBranch: { type: 'Json' },
+                        executiveBranch: { type: 'object' },
+                        legislativeBranch: { type: 'object' },
                         militaryBranch: {
-
+                            type: 'object'
                         },
                         species: { type: 'string' },
-
                     }
                 },
                 404: {

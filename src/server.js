@@ -5,6 +5,7 @@ import prismaConnector from '../src/plugins/prismaConnector.ts'
 import swagger from '@fastify/swagger'
 import swaggerUi from '@fastify/swagger-ui'
 
+
 const fastify = Fastify({
   logger: true
 })
