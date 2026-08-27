@@ -590,7 +590,7 @@ async function routes(
         }
     });
 
-    fastify.get<{ Querystring: Query }>('/government', {
+    fastify.get<{ Querystring: Query }>('/governments', {
         schema: {
             description: 'Returns all government',
             tags: ['Government'],
@@ -613,7 +613,6 @@ async function routes(
                                 properties: {
                                     id: { type: 'integer' },
                                     name: { type: 'string' },
-                                    slug: { type: 'string' },
                                     description: { type: 'string' },
                                     type: { type: 'string' }
                                 }
@@ -673,7 +672,7 @@ async function routes(
         }
     })
 
-    fastify.get<{ Querystring: Query; Params: { government: string } }>('/government/:government', {
+    fastify.get<{ Querystring: Query; Params: { government: string } }>('/governments/:government', {
         schema: {
             description: 'Returns a single government by slug',
             tags: ['Government'],
@@ -689,13 +688,25 @@ async function routes(
                     properties: {
                         id: { type: 'integer' },
                         name: { type: 'string' },
-                        slug: { type: 'string' },
                         description: { type: 'string' },
                         type: { type: 'string' },
-                        executiveBranch: { type: 'object' },
-                        legislativeBranch: { type: 'object' },
+                        executiveBranch: {
+                            type: 'object',
+                            properties: {
+                                name: { type: 'string' }
+                            }
+                        },
+                        legislativeBranch: {
+                            type: 'object',
+                            properties: {
+                                name: { type: 'string' }
+                            }
+                        },
                         militaryBranch: {
-                            type: 'object'
+                            type: 'object',
+                            properties: {
+                                name: { type: 'string' }
+                            }
                         },
                         species: { type: 'string' },
                     }
