@@ -736,7 +736,54 @@ async function routes(
         } catch (error) {
             reply.status(500).send(error)
         }
-    });
+    }),
+
+        fastify.get('/stats', {
+            schema: {
+                description: 'Returns database statistics',
+                tags: ['Stats'],
+                response: {
+                    200: {
+                        type: 'object',
+                        properties: {
+                            systems: { type: 'integer' },
+                            planets: { type: 'integer' },
+                            moons: { type: 'integer' },
+                            species: { type: 'integer' },
+                        },
+                        required: ['systems', 'planets', 'moons', 'species'],
+                    },
+                    500: {
+                        type: 'object',
+                        properties: {
+                            error: { type: 'string' },
+                        },
+                        required: ['error'],
+                    },
+                },
+            },
+        }, async (request, reply) => {
+            try {
+                const [systems, planets, moons, species] = await Promise.all([
+                    fastify.prisma.system.count(),
+                    fastify.prisma.planet.count(),
+                    fastify.prisma.moon.count(),
+                    fastify.prisma.species.count(),
+                ])
+
+                return {
+                    systems,
+                    planets,
+                    moons,
+                    species,
+                }
+            } catch (error) {
+                return reply.code(500).send({
+                    error: 'Internal server error',
+                })
+            }
+        })
+
 }
 
 export default routes
