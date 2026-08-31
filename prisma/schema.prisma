@@ -47,7 +47,7 @@ model system {
   description String
   stars       Int?
   colonized   String?
-  species     species?      @relation(fields: [speciesId], references: [id])
+  species     species?     @relation(fields: [speciesId], references: [id])
   speciesId   Int?
   government  government[]
   planets     planet[]
@@ -75,7 +75,7 @@ model species {
   aliases     String
   homeworld   planet       @relation("Homeworld", fields: [planetId], references: [id])
   planetId    Int
-  livesOn     planet[] @relation("Inhabitants")
+  livesOn     planet[]     @relation("Inhabitants")
   evolved     String
   disappeared String
   techlevel   String
@@ -86,5 +86,4 @@ model species {
   avgheight   Json
   avgweight   Json
   avglifespan Json
-  
 }

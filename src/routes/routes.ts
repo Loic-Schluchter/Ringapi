@@ -454,6 +454,13 @@ async function routes(
                                     name: { type: 'string' },
                                     slug: { type: 'string' },
                                     description: { type: 'string' },
+                                    stars: { type: 'integer' },
+                                    species: {
+                                        type: 'object',
+                                        properties: {
+                                            name: { type: 'string' }
+                                        },
+                                    }
                                 }
                             }
                         },
@@ -490,6 +497,9 @@ async function routes(
                     },
                     skip: skip,
                     take: limit,
+                    include: {
+                        species: { select: { name: true } }
+                    }
                 }),
                 fastify.prisma.system.count({ where })
             ])
@@ -497,6 +507,7 @@ async function routes(
             if (!allSystems) {
                 return reply.code(404).send({ error: 'Systems not found' })
             }
+            console.log(allSystems)
             return {
                 data: allSystems,
                 pagination: {
@@ -614,9 +625,9 @@ async function routes(
                                     id: { type: 'integer' },
                                     name: { type: 'string' },
                                     description: { type: 'string' },
-                                    type: { type: 'string' }
+                                    type: { type: 'string' },
                                 }
-                            }
+                            },
                         },
                         pagination: {
                             type: 'object',
