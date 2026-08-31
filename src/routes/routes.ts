@@ -460,6 +460,15 @@ async function routes(
                                         properties: {
                                             name: { type: 'string' }
                                         },
+                                    },
+                                    government: {
+                                        type: 'array',
+                                        items: {
+                                            type: 'object',
+                                            properties: {
+                                                name: { type: 'string' },
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -498,7 +507,9 @@ async function routes(
                     skip: skip,
                     take: limit,
                     include: {
-                        species: { select: { name: true } }
+                        species: { select: { name: true } },
+                        government: { select: { name: true } }
+
                     }
                 }),
                 fastify.prisma.system.count({ where })
