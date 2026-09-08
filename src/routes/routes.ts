@@ -533,7 +533,6 @@ async function routes(
         }
     })
 
-
     fastify.get<{ Querystring: Query; Params: { system: string } }>('/systems/:system', {
         schema: {
             description: 'Returns a single system by slug, including its planets',
@@ -608,7 +607,7 @@ async function routes(
 
             return foundSystem
         } catch (error) {
-            reply.status(500).send(error)
+            await reply.status(500).send(error)
         }
     });
 
@@ -690,7 +689,7 @@ async function routes(
                 }
             }
         } catch (err) {
-            reply.status(500).send(err)
+            await reply.status(500).send(err)
         }
     })
 
@@ -756,56 +755,93 @@ async function routes(
 
             return foundGovernment
         } catch (error) {
-            reply.status(500).send(error)
+            await reply.status(500).send(error)
         }
-    }),
+    });
 
-        fastify.get('/stats', {
-            schema: {
-                description: 'Returns database statistics',
-                tags: ['Stats'],
-                response: {
-                    200: {
-                        type: 'object',
-                        properties: {
-                            systems: { type: 'integer' },
-                            planets: { type: 'integer' },
-                            moons: { type: 'integer' },
-                            species: { type: 'integer' },
-                        },
-                        required: ['systems', 'planets', 'moons', 'species'],
+    fastify.get('/stats', {
+        schema: {
+            description: 'Returns database statistics',
+            tags: ['Stats'],
+            response: {
+                200: {
+                    type: 'object',
+                    properties: {
+                        systems: { type: 'integer' },
+                        planets: { type: 'integer' },
+                        moons: { type: 'integer' },
+                        species: { type: 'integer' },
                     },
-                    500: {
-                        type: 'object',
-                        properties: {
-                            error: { type: 'string' },
-                        },
-                        required: ['error'],
+                    required: ['systems', 'planets', 'moons', 'species'],
+                },
+                500: {
+                    type: 'object',
+                    properties: {
+                        error: { type: 'string' },
                     },
+                    required: ['error'],
                 },
             },
-        }, async (request, reply) => {
-            try {
-                const [systems, planets, moons, species] = await Promise.all([
-                    fastify.prisma.system.count(),
-                    fastify.prisma.planet.count(),
-                    fastify.prisma.moon.count(),
-                    fastify.prisma.species.count(),
-                ])
+        },
+    }, async (request, reply) => {
+        try {
+            const [systems, planets, moons, species] = await Promise.all([
+                fastify.prisma.system.count(),
+                fastify.prisma.planet.count(),
+                fastify.prisma.moon.count(),
+                fastify.prisma.species.count(),
+            ])
 
-                return {
-                    systems,
-                    planets,
-                    moons,
-                    species,
-                }
-            } catch (error) {
-                return reply.code(500).send({
-                    error: 'Internal server error',
-                })
+            return {
+                systems,
+                planets,
+                moons,
+                species,
             }
-        })
+        } catch (error) {
+            return reply.code(500).send({
+                error: 'Internal server error',
+            })
+        }
+    })
 
+    fastify.get("/health", {
+        schema:{
+            description: 'Returns api health check',
+            tags: ['Misc'],
+            response:{
+                200:{
+                    type: 'object',
+                    properties:{
+                        status: {type: "string"},
+                        database: {type: "string"}
+                    }
+                },
+                500: {
+                    type: 'object',
+                    properties: {
+                        status: { type: 'string' },
+                        database: {type: 'string'}
+                    },
+                    required: ['error'],
+                },
+            },
+        },
+    }, async (request, reply) =>{
+        try{
+            await fastify.prisma.$queryRaw`SELECT 1`
+            return {
+                status: "Ok",
+                database: "Ok"
+            }
+        }
+        catch (e) {
+            return reply.status(500).send({
+                status: "error",
+                database: "error"
+            })
+        }
+    })
 }
 
 export default routes
